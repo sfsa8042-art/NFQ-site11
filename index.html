@@ -1,0 +1,1431 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NFQ — Комплексный аудит 3-в-1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ink:#07090f;--ink-2:#0e1117;--ink-3:#151921;--ink-4:#1c2230;
+  --panel:#121620;--panel-2:#181e2a;
+  --border:rgba(255,255,255,.07);--border-2:rgba(255,255,255,.12);
+  --gold:#c9a84c;--gold-2:#e8c76a;--gold-3:#f5dea0;
+  --gold-dim:rgba(201,168,76,.12);--gold-glow:rgba(201,168,76,.18);
+  --blue:#3b6ef0;--blue-2:#5a87ff;--blue-dim:rgba(59,110,240,.12);
+  --red-risk:#ff4d4d;--amber-risk:#f59e0b;--green-safe:#22c55e;
+  --green-dim:rgba(34,197,94,.12);
+  --t-primary:#f0f2f5;--t-secondary:rgba(240,242,245,.55);--t-muted:rgba(240,242,245,.3);--t-gold:#e8c76a;
+  --font-display:'Syne',sans-serif;--font-body:'DM Sans',sans-serif;--font-mono:'DM Mono',monospace;
+  --r:6px;--r-lg:10px;--r-xl:16px;--r-2xl:24px;--r-3xl:32px;--max:1200px;
+  --ease:.28s cubic-bezier(.4,0,.2,1);
+  --shadow-sm:0 1px 3px rgba(0,0,0,.4);--shadow:0 4px 16px rgba(0,0,0,.5);
+  --shadow-lg:0 12px 48px rgba(0,0,0,.6);--shadow-xl:0 24px 80px rgba(0,0,0,.7);
+}
+html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased}
+body{background:var(--ink);color:var(--t-primary);font-family:var(--font-body);font-size:16px;line-height:1.6;overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+button{cursor:pointer;border:none;background:none;font:inherit;color:inherit}
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:var(--ink)}
+::-webkit-scrollbar-thumb{background:var(--ink-4);border-radius:2px}
+.c{width:100%;max-width:var(--max);margin:0 auto;padding:0 40px}
+
+/* Grain */
+body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.028;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");background-size:220px}
+
+/* Scroll reveal */
+.sr{opacity:0;transform:translateY(28px);transition:.75s cubic-bezier(.22,1,.36,1)}
+.sr.in{opacity:1;transform:none}
+.sr-l{opacity:0;transform:translateX(-22px);transition:.7s cubic-bezier(.22,1,.36,1)}
+.sr-l.in{opacity:1;transform:none}
+.sr-r{opacity:0;transform:translateX(22px);transition:.7s cubic-bezier(.22,1,.36,1)}
+.sr-r.in{opacity:1;transform:none}
+
+/* Eyebrow */
+.eyebrow{display:inline-flex;align-items:center;gap:8px;font-family:var(--font-mono);font-size:11px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:18px}
+.eyebrow::before{content:'';width:24px;height:1px;background:var(--gold);opacity:.6}
+
+/* Buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font-family:var(--font-body);font-size:14px;font-weight:600;letter-spacing:.2px;border-radius:var(--r-lg);padding:12px 24px;transition:var(--ease);cursor:pointer;white-space:nowrap;position:relative;overflow:hidden}
+.btn::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.08),transparent);opacity:0;transition:var(--ease)}
+.btn:hover::after{opacity:1}
+.btn-primary{background:var(--gold);color:var(--ink);font-weight:700;box-shadow:0 3px 16px rgba(201,168,76,.35)}
+.btn-primary:hover{background:var(--gold-2);transform:translateY(-1px);box-shadow:0 6px 28px rgba(201,168,76,.45)}
+.btn-secondary{background:rgba(255,255,255,.05);color:var(--t-primary);border:1px solid var(--border-2);backdrop-filter:blur(8px)}
+.btn-secondary:hover{background:rgba(255,255,255,.09);border-color:rgba(255,255,255,.2);transform:translateY(-1px)}
+.btn-ghost{background:transparent;color:var(--t-secondary);border:1px solid var(--border)}
+.btn-ghost:hover{border-color:var(--gold);color:var(--gold)}
+.btn-lg{padding:14px 30px;font-size:15px;border-radius:var(--r-xl)}
+.btn-xl{padding:16px 38px;font-size:15px;border-radius:var(--r-xl)}
+
+/* Badge */
+.badge{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:999px;font-size:11px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;font-family:var(--font-mono)}
+.badge-gold{background:var(--gold-dim);border:1px solid rgba(201,168,76,.25);color:var(--gold)}
+.badge-green{background:var(--green-dim);border:1px solid rgba(34,197,94,.2);color:var(--green-safe)}
+.badge-red{background:rgba(255,77,77,.1);border:1px solid rgba(255,77,77,.2);color:var(--red-risk)}
+.badge-amber{background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.2);color:var(--amber-risk)}
+
+.section{padding:120px 0;position:relative}
+.section-sm{padding:80px 0;position:relative}
+.sec-title{font-family:var(--font-display);font-size:clamp(34px,3.5vw,52px);font-weight:700;line-height:1.08;letter-spacing:-.04em;color:var(--t-primary);margin-bottom:18px}
+.sec-sub{font-size:18px;color:var(--t-secondary);line-height:1.75;max-width:560px;font-weight:400}
+.sec-header-center{text-align:center}
+.sec-header-center .sec-sub{margin:0 auto}
+.divider{width:100%;height:1px;background:linear-gradient(90deg,transparent,var(--border-2),transparent);border:none}
+
+/* ═══ NAV ═══ */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(7,9,15,.82);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-bottom:1px solid var(--border);transition:var(--ease)}
+nav.scrolled{background:rgba(7,9,15,.96)}
+.nav-inner{display:flex;align-items:center;justify-content:space-between;height:64px}
+.nav-logo{display:flex;align-items:center;gap:10px}
+.nav-logo-mark{width:32px;height:32px;background:linear-gradient(135deg,var(--gold),#8a6010);border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:15px;font-weight:800;color:var(--ink);flex-shrink:0}
+.nav-logo-name{font-family:var(--font-display);font-size:20px;font-weight:700;color:var(--t-primary);letter-spacing:-.02em}
+.nav-logo-name span{color:var(--gold)}
+.nav-logo-badge{font-family:var(--font-mono);font-size:9px;font-weight:500;letter-spacing:1.5px;text-transform:uppercase;color:var(--t-muted);padding:2px 7px;border:1px solid var(--border);border-radius:3px}
+.nav-links{display:flex;gap:32px;list-style:none}
+.nav-links a{font-size:13px;font-weight:500;color:var(--t-secondary);transition:var(--ease);letter-spacing:.1px}
+.nav-links a:hover{color:var(--t-primary)}
+.nav-right{display:flex;gap:10px;align-items:center}
+
+/* ═══ HERO ═══ */
+.hero{min-height:100vh;display:flex;align-items:center;padding-top:64px;position:relative;overflow:hidden}
+.hero-ambient{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.hero-orb{position:absolute;border-radius:50%;filter:blur(80px);opacity:.4}
+.hero-orb-1{width:600px;height:600px;background:radial-gradient(circle,rgba(201,168,76,.14),transparent 70%);top:-100px;right:-80px}
+.hero-orb-2{width:400px;height:400px;background:radial-gradient(circle,rgba(59,110,240,.1),transparent 70%);bottom:100px;left:-60px}
+.hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.02) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.02) 1px,transparent 1px);background-size:64px 64px}
+.hero-grid::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 70% 50%,transparent 20%,rgba(7,9,15,.9) 80%)}
+.hero-inner{position:relative;z-index:1;display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center;padding:80px 0 100px}
+.hero-kicker{display:flex;align-items:center;gap:10px;margin-bottom:28px}
+.kicker-dot{width:6px;height:6px;border-radius:50%;background:var(--green-safe);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(34,197,94,.4)}50%{box-shadow:0 0 0 6px rgba(34,197,94,0)}}
+.kicker-text{font-family:var(--font-mono);font-size:11px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:var(--t-secondary)}
+.hero-headline{font-family:var(--font-display);font-size:clamp(42px,4.8vw,66px);font-weight:800;line-height:1.02;letter-spacing:-.05em;color:var(--t-primary);margin-bottom:24px}
+.hero-headline .hl-gold{color:var(--gold-2);position:relative;display:inline-block}
+.hero-headline .hl-gold::after{content:'';position:absolute;bottom:-2px;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--gold),transparent);opacity:.5}
+.hero-sub{font-size:17px;color:var(--t-secondary);line-height:1.8;max-width:480px;margin-bottom:36px;font-weight:400}
+.hero-vals{display:flex;flex-direction:column;gap:10px;margin-bottom:40px}
+.hero-val{display:flex;align-items:center;gap:10px;font-size:14px;color:var(--t-secondary);font-weight:500}
+.hero-val-ico{width:20px;height:20px;border-radius:50%;background:var(--green-dim);border:1px solid rgba(34,197,94,.25);display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;color:var(--green-safe)}
+.hero-actions{display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin-bottom:48px}
+.hero-trust{display:flex;align-items:center;gap:20px;padding-top:28px;border-top:1px solid var(--border)}
+.hero-trust-label{font-size:12px;color:var(--t-muted);font-weight:500;letter-spacing:.5px;white-space:nowrap}
+.hero-trust-nums{display:flex;gap:28px}
+.hero-trust-item{text-align:center}
+.hero-trust-val{font-family:var(--font-display);font-size:22px;font-weight:700;color:var(--t-primary);letter-spacing:-.03em}
+.hero-trust-lab{font-size:11px;color:var(--t-muted);margin-top:1px}
+
+/* Dashboard */
+.hero-right{position:relative}
+.hero-dash{background:var(--panel);border:1px solid var(--border-2);border-radius:var(--r-3xl);box-shadow:var(--shadow-xl),0 0 80px rgba(201,168,76,.06);overflow:hidden;position:relative}
+.hero-dash::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(201,168,76,.4),transparent)}
+.dash-topbar{background:var(--ink-4);border-bottom:1px solid var(--border);padding:12px 18px;display:flex;align-items:center;gap:10px}
+.dash-dots{display:flex;gap:6px}
+.dash-dot{width:10px;height:10px;border-radius:50%}
+.dash-dot-r{background:#ff5f57}.dash-dot-y{background:#ffbd2e}.dash-dot-g{background:#28ca41}
+.dash-title{font-family:var(--font-mono);font-size:11px;color:var(--t-muted);margin-left:auto;margin-right:auto;letter-spacing:.5px}
+.dash-body{padding:20px}
+.dash-score-row{display:grid;grid-template-columns:auto 1fr;gap:20px;align-items:center;margin-bottom:18px}
+.risk-ring-wrap{position:relative;width:88px;height:88px;flex-shrink:0}
+.risk-ring-svg{transform:rotate(-90deg)}
+.risk-ring-track{fill:none;stroke:rgba(255,255,255,.07);stroke-width:8}
+.risk-ring-fill{fill:none;stroke-width:8;stroke-linecap:round;stroke-dasharray:220;stroke-dashoffset:220;transition:stroke-dashoffset 2s cubic-bezier(.4,0,.2,1) .5s}
+.risk-ring-fill.amber{stroke:var(--amber-risk)}.risk-ring-fill.red{stroke:var(--red-risk)}.risk-ring-fill.green{stroke:var(--green-safe)}
+.risk-ring-num{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:var(--font-display)}
+.ring-score{font-size:22px;font-weight:800;color:var(--t-primary);line-height:1}
+.ring-label{font-size:8px;color:var(--t-muted);text-transform:uppercase;letter-spacing:.8px;margin-top:2px}
+.score-info-title{font-family:var(--font-display);font-size:15px;font-weight:700;color:var(--t-primary);margin-bottom:6px}
+.score-info-desc{font-size:12px;color:var(--t-secondary);line-height:1.5}
+.score-cat{display:inline-flex;align-items:center;gap:5px;margin-top:8px;padding:3px 10px;border-radius:999px;font-size:10px;font-weight:700;letter-spacing:.5px;font-family:var(--font-mono)}
+.score-cat.amber{background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.25);color:var(--amber-risk)}
+.score-cat.green{background:var(--green-dim);border:1px solid rgba(34,197,94,.25);color:var(--green-safe)}
+.risk-bars{display:flex;flex-direction:column;gap:8px;margin-bottom:16px}
+.risk-bar-row{display:grid;grid-template-columns:100px 1fr 36px;gap:8px;align-items:center}
+.rbl{font-size:11px;color:var(--t-secondary);font-weight:500}
+.rb-track{height:5px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden}
+.rb-fill{height:100%;border-radius:3px;transition:width 1.5s cubic-bezier(.4,0,.2,1) .8s;width:0}
+.rb-fill.danger{background:linear-gradient(90deg,#ff6b6b,#ff4d4d)}
+.rb-fill.warn{background:linear-gradient(90deg,#fbbf24,#f59e0b)}
+.rb-fill.ok{background:linear-gradient(90deg,#4ade80,#22c55e)}
+.rb-fill.mid{background:linear-gradient(90deg,#60a5fa,#3b6ef0)}
+.rb-val{font-family:var(--font-mono);font-size:10px;text-align:right;font-weight:500}
+.rb-val.danger{color:var(--red-risk)}.rb-val.warn{color:var(--amber-risk)}.rb-val.ok{color:var(--green-safe)}.rb-val.mid{color:var(--blue-2)}
+.dash-ai{background:linear-gradient(135deg,rgba(201,168,76,.06),rgba(59,110,240,.04));border:1px solid rgba(201,168,76,.12);border-radius:var(--r-lg);padding:12px 14px;display:flex;gap:10px;align-items:flex-start;margin-bottom:12px}
+.dash-ai-ico{font-size:18px;flex-shrink:0}
+.dash-ai-label{font-family:var(--font-mono);font-size:9px;font-weight:500;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:3px}
+.dash-ai-msg{font-size:11px;color:var(--t-secondary);line-height:1.5}
+.dash-alerts{display:flex;flex-direction:column;gap:6px}
+.alert-row{display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:var(--r);font-size:11px}
+.alert-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.danger-bg{background:rgba(255,77,77,.06);border:1px solid rgba(255,77,77,.12)}
+.warn-bg{background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.12)}
+.ok-bg{background:rgba(34,197,94,.06);border:1px solid rgba(34,197,94,.12)}
+.hero-float{position:absolute;z-index:2}
+.hero-float-1{top:-16px;right:-20px}
+.hero-float-2{bottom:40px;left:-24px}
+.float-card{background:var(--panel-2);border:1px solid var(--border-2);border-radius:var(--r-xl);padding:12px 16px;box-shadow:var(--shadow-lg);min-width:140px}
+.float-card-label{font-size:10px;color:var(--t-muted);font-family:var(--font-mono);letter-spacing:.5px;margin-bottom:4px;text-transform:uppercase}
+.float-card-val{font-family:var(--font-display);font-size:22px;font-weight:700;color:var(--t-primary);letter-spacing:-.03em}
+.float-card-sub{font-size:11px;margin-top:2px;font-weight:500}
+.float-card-sub.up{color:var(--green-safe)}
+.float-card-sub.red{color:var(--red-risk)}
+
+/* ═══ LOGOS STRIP ═══ */
+.logos-strip{border-top:1px solid var(--border);border-bottom:1px solid var(--border);background:rgba(255,255,255,.01);padding:24px 0}
+.logos-inner{display:flex;align-items:center;gap:40px;flex-wrap:wrap;justify-content:center}
+.logos-label{font-family:var(--font-mono);font-size:10px;font-weight:500;letter-spacing:1.5px;text-transform:uppercase;color:var(--t-muted);flex-shrink:0}
+.logo-chip{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:rgba(240,242,245,.3);letter-spacing:.2px;transition:var(--ease)}
+.logo-chip:hover{color:rgba(240,242,245,.6)}
+.logo-chip-dot{width:6px;height:6px;border-radius:50%;background:currentColor;opacity:.5}
+
+/* ═══ FINES ═══ */
+.fines-section{background:var(--ink-3);position:relative;overflow:hidden}
+.fines-section::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 50% at 50% 100%,rgba(255,77,77,.04),transparent);pointer-events:none}
+.fines-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:48px}
+.fine-card{background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:var(--r-2xl);padding:24px 22px;display:flex;flex-direction:column;gap:14px;transition:.35s cubic-bezier(.22,1,.36,1);position:relative;overflow:hidden}
+.fine-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--border-2);transition:var(--ease)}
+.fine-card:hover{transform:translateY(-4px);border-color:rgba(255,77,77,.2);box-shadow:0 16px 48px rgba(0,0,0,.4)}
+.fine-card:hover::before{background:linear-gradient(90deg,var(--red-risk),var(--amber-risk))}
+.fine-card-accent{border-color:rgba(255,77,77,.15);background:rgba(255,77,77,.03)}
+.fine-card-accent::before{background:linear-gradient(90deg,var(--red-risk),#ff8c42)!important}
+.fine-ico{font-size:28px;line-height:1}
+.fine-dept{font-family:var(--font-mono);font-size:9px;font-weight:500;letter-spacing:1.5px;text-transform:uppercase;color:var(--t-muted);margin-bottom:4px}
+.fine-title{font-family:var(--font-display);font-size:16px;font-weight:700;color:var(--t-primary);letter-spacing:-.02em;margin-bottom:6px}
+.fine-desc{font-size:12px;color:var(--t-muted);line-height:1.6}
+.fine-amount{margin-top:auto;display:flex;align-items:baseline;gap:4px;font-family:var(--font-display);font-size:26px;font-weight:800;color:var(--red-risk);letter-spacing:-.04em;line-height:1}
+.fine-total{font-size:30px}
+.fine-up-to{font-size:12px;font-weight:500;color:var(--t-muted);font-family:var(--font-body);letter-spacing:0}
+
+/* ═══ EXPRESS FORM ═══ */
+.express-section{background:var(--ink-2);position:relative;overflow:hidden}
+.express-section::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 50% 80% at 50% 0%,rgba(201,168,76,.04),transparent);pointer-events:none}
+.express-grid{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:flex-start;margin-top:64px}
+.form-card{background:var(--panel);border:1px solid var(--border-2);border-radius:var(--r-2xl);overflow:hidden;box-shadow:var(--shadow-xl);position:relative}
+.form-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(201,168,76,.35),transparent)}
+.form-topbar{background:var(--ink-4);border-bottom:1px solid var(--border);padding:14px 20px;display:flex;align-items:center;gap:8px}
+.form-topbar-title{font-family:var(--font-mono);font-size:11px;color:var(--t-secondary);letter-spacing:.5px}
+.form-body{padding:28px}
+.form-row{margin-bottom:18px}
+.form-label{display:block;font-size:12px;font-weight:600;color:var(--t-secondary);letter-spacing:.5px;text-transform:uppercase;font-family:var(--font-mono);margin-bottom:8px}
+.form-select,.form-input{width:100%;padding:11px 14px;background:rgba(255,255,255,.04);border:1px solid var(--border-2);border-radius:var(--r-lg);font-family:var(--font-body);font-size:14px;color:var(--t-primary);transition:var(--ease);outline:none;appearance:none;-webkit-appearance:none;cursor:pointer}
+.form-select:focus,.form-input:focus{border-color:rgba(201,168,76,.4);background:rgba(201,168,76,.04);box-shadow:0 0 0 3px rgba(201,168,76,.08)}
+.form-select option{background:var(--ink-3);color:var(--t-primary)}
+.form-select-wrap{position:relative}
+.form-select-wrap::after{content:'▾';position:absolute;right:14px;top:50%;transform:translateY(-50%);color:var(--t-muted);pointer-events:none;font-size:12px}
+.form-radio-group{display:flex;gap:10px}
+.form-radio{flex:1}
+.form-radio input[type=radio]{display:none}
+.form-radio-label{display:flex;align-items:center;justify-content:center;padding:10px;border-radius:var(--r-lg);border:1px solid var(--border-2);background:rgba(255,255,255,.03);font-size:13px;color:var(--t-secondary);cursor:pointer;transition:var(--ease);font-weight:500}
+.form-radio input[type=radio]:checked+.form-radio-label{border-color:rgba(201,168,76,.4);background:rgba(201,168,76,.08);color:var(--gold-2)}
+.form-radio-label:hover{border-color:rgba(255,255,255,.2);color:var(--t-primary)}
+.express-info{display:flex;flex-direction:column;gap:16px;padding-top:12px}
+.ei-item{display:flex;align-items:flex-start;gap:16px;padding:20px 22px;border-radius:var(--r-xl);border:1px solid transparent;transition:var(--ease)}
+.ei-item:hover{background:rgba(255,255,255,.025);border-color:var(--border)}
+.ei-ico{width:44px;height:44px;border-radius:var(--r-lg);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;border:1px solid var(--border);background:var(--panel)}
+.ei-title{font-family:var(--font-display);font-size:16px;font-weight:700;color:var(--t-primary);margin-bottom:4px;letter-spacing:-.01em}
+.ei-desc{font-size:13px;color:var(--t-secondary);line-height:1.6}
+
+/* ═══ RESULT ═══ */
+.result-section{background:var(--ink);display:none}
+.result-section.visible{display:block}
+.result-grid{display:grid;grid-template-columns:1fr 1fr;gap:48px;margin-top:64px;align-items:flex-start}
+.result-score-card{background:var(--panel);border:1px solid var(--border-2);border-radius:var(--r-2xl);overflow:hidden;box-shadow:var(--shadow-xl);position:relative}
+.result-score-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(201,168,76,.35),transparent)}
+.result-header{background:var(--ink-4);padding:16px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.result-header-title{font-family:var(--font-mono);font-size:11px;color:var(--t-secondary);letter-spacing:.5px}
+.result-header-badge{font-family:var(--font-mono);font-size:10px;color:var(--gold)}
+.result-score-body{padding:28px}
+.score-gauge-wrap{display:flex;align-items:center;gap:24px;margin-bottom:24px}
+.score-gauge{position:relative;width:120px;height:120px;flex-shrink:0}
+.score-gauge svg{transform:rotate(-90deg)}
+.score-ring-track{fill:none;stroke:rgba(255,255,255,.07);stroke-width:10}
+.score-ring-fill{fill:none;stroke-width:10;stroke-linecap:round;stroke-dasharray:307;stroke-dashoffset:307;transition:stroke-dashoffset 2s cubic-bezier(.4,0,.2,1) .3s}
+.score-ring-fill.low{stroke:var(--green-safe)}.score-ring-fill.medium{stroke:var(--amber-risk)}.score-ring-fill.high{stroke:var(--red-risk)}
+.score-num-wrap{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.score-num-big{font-family:var(--font-display);font-size:34px;font-weight:800;line-height:1;letter-spacing:-.04em}
+.score-num-big.low{color:var(--green-safe)}.score-num-big.medium{color:var(--amber-risk)}.score-num-big.high{color:var(--red-risk)}
+.score-num-label{font-size:9px;color:var(--t-muted);text-transform:uppercase;letter-spacing:1px;margin-top:2px;font-family:var(--font-mono)}
+.score-meta-title{font-family:var(--font-display);font-size:18px;font-weight:700;color:var(--t-primary);margin-bottom:8px}
+.score-meta-desc{font-size:13px;color:var(--t-secondary);line-height:1.6;margin-bottom:12px}
+.score-verdict{display:inline-flex;align-items:center;gap:6px;padding:5px 14px;border-radius:999px;font-size:11px;font-weight:700;letter-spacing:.5px;font-family:var(--font-mono)}
+.score-verdict.low{background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.25);color:var(--green-safe)}
+.score-verdict.medium{background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.25);color:var(--amber-risk)}
+.score-verdict.high{background:rgba(255,77,77,.1);border:1px solid rgba(255,77,77,.25);color:var(--red-risk)}
+.result-cats{display:flex;flex-direction:column;gap:12px}
+.result-cat-item{display:grid;grid-template-columns:130px 1fr 44px;gap:10px;align-items:center}
+.rci-label{font-size:12px;color:var(--t-secondary);font-weight:500}
+.rci-track{height:6px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden}
+.rci-fill{height:100%;border-radius:3px;width:0;transition:width 1.5s cubic-bezier(.4,0,.2,1) .5s}
+.rci-fill.danger{background:linear-gradient(90deg,#ff6b6b,#ff4d4d)}.rci-fill.warn{background:linear-gradient(90deg,#fbbf24,#f59e0b)}.rci-fill.ok{background:linear-gradient(90deg,#4ade80,#22c55e)}.rci-fill.mid{background:linear-gradient(90deg,#60a5fa,#3b6ef0)}
+.rci-val{font-family:var(--font-mono);font-size:11px;font-weight:500;text-align:right}
+.rci-val.danger{color:var(--red-risk)}.rci-val.warn{color:var(--amber-risk)}.rci-val.ok{color:var(--green-safe)}.rci-val.mid{color:var(--blue-2)}
+.result-recs{background:var(--panel);border:1px solid var(--border-2);border-radius:var(--r-2xl);padding:28px}
+.result-recs-title{font-family:var(--font-display);font-size:20px;font-weight:700;color:var(--t-primary);margin-bottom:20px;letter-spacing:-.02em}
+.rec-item{display:flex;align-items:flex-start;gap:14px;padding:16px;border-radius:var(--r-xl);border:1px solid var(--border);background:rgba(255,255,255,.02);margin-bottom:10px;transition:var(--ease)}
+.rec-item:hover{background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.1)}
+.rec-prio{width:32px;height:32px;border-radius:var(--r);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;font-family:var(--font-mono)}
+.rec-prio.p1{background:rgba(255,77,77,.12);border:1px solid rgba(255,77,77,.25);color:var(--red-risk)}
+.rec-prio.p2{background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.25);color:var(--amber-risk)}
+.rec-prio.p3{background:rgba(59,110,240,.12);border:1px solid rgba(59,110,240,.25);color:var(--blue-2)}
+.rec-text-title{font-size:14px;font-weight:600;color:var(--t-primary);margin-bottom:3px}
+.rec-text-desc{font-size:12px;color:var(--t-secondary);line-height:1.55}
+
+/* ═══ HOW SECTION ═══ */
+.how-section{background:var(--ink-2)}
+.how-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:2px;margin-top:64px;background:var(--border);border-radius:var(--r-2xl);overflow:hidden}
+.how-card{background:var(--panel);padding:36px 28px;position:relative;transition:var(--ease)}
+.how-card:hover{background:var(--panel-2)}
+.how-card-num{font-family:var(--font-mono);font-size:11px;font-weight:500;letter-spacing:2px;color:var(--t-muted);margin-bottom:24px;display:flex;align-items:center;gap:10px}
+.how-card-num::after{content:'';flex:1;height:1px;background:var(--border)}
+.how-card-ico{width:48px;height:48px;border-radius:var(--r-xl);display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:18px;border:1px solid var(--border);position:relative;overflow:hidden}
+.how-card-ico.gold{border-color:rgba(201,168,76,.2);background:rgba(201,168,76,.05)}
+.how-card-ico.blue{border-color:rgba(59,110,240,.2);background:rgba(59,110,240,.05)}
+.how-card-ico.green{border-color:rgba(34,197,94,.2);background:rgba(34,197,94,.05)}
+.how-card-ico.red{border-color:rgba(255,77,77,.2);background:rgba(255,77,77,.05)}
+.how-card h3{font-family:var(--font-display);font-size:17px;font-weight:700;color:var(--t-primary);margin-bottom:8px;letter-spacing:-.02em}
+.how-card p{font-size:13px;color:var(--t-secondary);line-height:1.7}
+.how-card-time{display:inline-flex;align-items:center;gap:4px;margin-top:14px;padding:4px 10px;border-radius:999px;font-family:var(--font-mono);font-size:10px;font-weight:500;letter-spacing:.5px;background:var(--gold-dim);border:1px solid rgba(201,168,76,.2);color:var(--gold)}
+.how-card-arrow{position:absolute;top:36px;right:-1px;width:24px;height:24px;background:var(--panel);border:1px solid var(--border);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--t-muted);z-index:1}
+.how-card:last-child .how-card-arrow{display:none}
+
+/* ═══ PACKAGES ═══ */
+.packages-section{background:var(--ink)}
+.pricing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:64px;align-items:start}
+.pkg-card{background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:var(--r-2xl);overflow:hidden;transition:.35s cubic-bezier(.22,1,.36,1);position:relative}
+.pkg-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:var(--border-2);transition:var(--ease)}
+.pkg-card:hover{transform:translateY(-5px);border-color:rgba(201,168,76,.2);box-shadow:var(--shadow-lg),0 0 0 1px rgba(201,168,76,.05)}
+.pkg-card:hover::before{background:linear-gradient(90deg,transparent,rgba(201,168,76,.4),transparent)}
+.pkg-card-featured{border-color:rgba(201,168,76,.2);background:rgba(201,168,76,.03);transform:scale(1.02);box-shadow:0 0 60px rgba(201,168,76,.1)}
+.pkg-card-featured::before{background:linear-gradient(90deg,transparent,rgba(201,168,76,.5),transparent)}
+.pkg-header{padding:28px 28px 22px}
+.pkg-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.pkg-name{font-family:var(--font-display);font-size:20px;font-weight:700;color:var(--t-primary);letter-spacing:-.03em}
+.pkg-price{display:flex;align-items:baseline;gap:4px;margin-bottom:6px}
+.pkg-price-val{font-family:var(--font-display);font-size:38px;font-weight:800;color:var(--t-primary);letter-spacing:-.05em;line-height:1}
+.pkg-price-curr{font-size:20px;color:var(--gold);font-weight:700}
+.pkg-price-note{font-size:12px;color:var(--t-muted);margin-top:4px}
+.pkg-save{font-family:var(--font-mono);font-size:10px;padding:3px 10px;border-radius:999px;background:var(--green-dim);border:1px solid rgba(34,197,94,.2);color:var(--green-safe)}
+.pkg-divider{height:1px;background:var(--border);margin:0 28px}
+.pkg-features{padding:24px 28px 28px;list-style:none;display:flex;flex-direction:column;gap:10px}
+.pkg-feat-item{display:flex;align-items:flex-start;gap:10px;font-size:13px;color:var(--t-secondary)}
+.pkg-feat-item::before{content:'';width:16px;height:16px;border-radius:50%;border:1px solid rgba(34,197,94,.3);background:rgba(34,197,94,.08);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;background-image:url("data:image/svg+xml,%3Csvg width='8' height='8' viewBox='0 0 8 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1.5 4L3.5 6L6.5 2.5' stroke='%2322c55e' stroke-width='1.3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:center}
+.pkg-cta{display:block;text-align:center;margin:0 28px 28px;padding:13px;border-radius:var(--r-xl);font-weight:600;font-size:14px;letter-spacing:.1px;transition:var(--ease);cursor:pointer;border:none}
+.pkg-cta-primary{background:var(--gold);color:var(--ink);font-weight:700}
+.pkg-cta-primary:hover{background:var(--gold-2)}
+.pkg-cta-outline{background:transparent;border:1px solid var(--border-2);color:var(--t-secondary)}
+.pkg-cta-outline:hover{border-color:rgba(201,168,76,.4);color:var(--gold)}
+
+/* ═══ WHO SECTION ═══ */
+.who-section{background:var(--ink-2)}
+.who-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:64px}
+.who-card{padding:30px;border-radius:var(--r-2xl);border:1px solid var(--border);background:rgba(255,255,255,.02);position:relative;overflow:hidden;transition:.35s cubic-bezier(.22,1,.36,1)}
+.who-card:hover{border-color:rgba(201,168,76,.2);transform:translateY(-4px);box-shadow:0 16px 48px rgba(0,0,0,.4)}
+.who-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--gold),var(--amber-risk));transform:scaleX(0);transition:transform .35s cubic-bezier(.22,1,.36,1);transform-origin:left}
+.who-card:hover::after{transform:scaleX(1)}
+.who-card-ico{font-size:2.4rem;margin-bottom:16px;display:block}
+.who-card h3{font-family:var(--font-display);font-size:19px;font-weight:700;color:var(--t-primary);margin-bottom:8px;letter-spacing:-.02em}
+.who-card-desc{font-size:13px;color:var(--t-secondary);line-height:1.7;margin-bottom:16px}
+.who-card-risk{padding:12px 14px;border-radius:var(--r-lg);background:rgba(255,77,77,.06);border:1px solid rgba(255,77,77,.15);font-size:12px;color:rgba(255,77,77,.85);line-height:1.5}
+.who-card-risk strong{color:var(--red-risk)}
+
+/* ═══ AI CHAT ═══ */
+.ai-section{background:var(--ink-3);position:relative;overflow:hidden}
+.ai-section::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 50% 60% at 80% 50%,rgba(59,110,240,.05),transparent);pointer-events:none}
+.ai-section-inner{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:flex-start;margin-top:64px}
+.chat-window{background:var(--panel);border:1px solid var(--border-2);border-radius:var(--r-2xl);overflow:hidden;box-shadow:var(--shadow-xl);position:relative}
+.chat-window::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(59,110,240,.4),transparent)}
+.chat-topbar{background:var(--ink-4);border-bottom:1px solid var(--border);padding:12px 18px;display:flex;align-items:center;gap:10px}
+.chat-av{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--gold),#5a87ff);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--ink)}
+.chat-info-name{font-size:13px;font-weight:600;color:var(--t-primary)}
+.chat-info-status{font-size:11px;color:var(--green-safe);font-family:var(--font-mono)}
+.chat-msgs{height:340px;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:14px}
+.chat-msgs::-webkit-scrollbar{width:3px}
+.chat-msgs::-webkit-scrollbar-thumb{background:var(--ink-4)}
+.chat-msg{display:flex;gap:10px;align-items:flex-start}
+.chat-msg.user{flex-direction:row-reverse}
+.chat-msg-av{width:28px;height:28px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;font-family:var(--font-mono)}
+.chat-msg.bot .chat-msg-av{background:linear-gradient(135deg,var(--gold),#8a6010);color:var(--ink)}
+.chat-msg.user .chat-msg-av{background:rgba(255,255,255,.08);color:var(--t-secondary)}
+.chat-bubble{max-width:80%;padding:10px 14px;border-radius:var(--r-xl);font-size:13px;line-height:1.65}
+.chat-msg.bot .chat-bubble{background:var(--panel-2);border:1px solid var(--border);color:var(--t-secondary);border-bottom-left-radius:var(--r)}
+.chat-msg.user .chat-bubble{background:var(--gold-dim);border:1px solid rgba(201,168,76,.2);color:var(--t-primary);border-bottom-right-radius:var(--r)}
+.chat-input-row{border-top:1px solid var(--border);padding:14px 18px;display:flex;gap:10px}
+.chat-input{flex:1;background:rgba(255,255,255,.04);border:1px solid var(--border-2);border-radius:var(--r-lg);padding:10px 14px;font-family:var(--font-body);font-size:13px;color:var(--t-primary);outline:none;transition:var(--ease)}
+.chat-input:focus{border-color:rgba(201,168,76,.35);background:rgba(201,168,76,.03)}
+.chat-input::placeholder{color:var(--t-muted)}
+.chat-send{width:36px;height:36px;border-radius:var(--r-lg);background:var(--gold);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:var(--ease);cursor:pointer;border:none;color:var(--ink)}
+.chat-send:hover{background:var(--gold-2);transform:scale(1.05)}
+.chat-chips{display:flex;gap:8px;padding:10px 18px 0;flex-wrap:wrap;border-top:1px solid var(--border)}
+.chat-chip{padding:5px 12px;border-radius:999px;border:1px solid var(--border-2);font-size:11px;color:var(--t-secondary);cursor:pointer;transition:var(--ease);font-family:var(--font-mono)}
+.chat-chip:hover{border-color:var(--gold);color:var(--gold)}
+.typing-indicator{display:flex;gap:4px;align-items:center;padding:2px 0}
+.typing-dot{width:6px;height:6px;border-radius:50%;background:var(--t-muted);animation:typing .8s infinite}
+.typing-dot:nth-child(2){animation-delay:.15s}
+.typing-dot:nth-child(3){animation-delay:.3s}
+@keyframes typing{0%,80%,100%{transform:scale(1);opacity:.4}40%{transform:scale(1.2);opacity:1}}
+.ai-right-info{display:flex;flex-direction:column;gap:20px}
+.ai-feat-item{display:flex;align-items:flex-start;gap:16px;padding:20px 22px;border-radius:var(--r-xl);border:1px solid transparent;transition:var(--ease)}
+.ai-feat-item:hover{background:rgba(255,255,255,.025);border-color:var(--border)}
+.ai-feat-ico{width:44px;height:44px;border-radius:var(--r-lg);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;border:1px solid var(--border);background:var(--panel)}
+.ai-feat-title{font-family:var(--font-display);font-size:16px;font-weight:700;color:var(--t-primary);margin-bottom:4px;letter-spacing:-.01em}
+.ai-feat-desc{font-size:13px;color:var(--t-secondary);line-height:1.6}
+
+/* ═══ STATS ROW ═══ */
+.stats-section{background:var(--ink)}
+.stats-row{display:flex;gap:0;border:1px solid var(--border);border-radius:var(--r-2xl);overflow:hidden;margin-top:56px}
+.stat-item{flex:1;padding:40px 32px;border-right:1px solid var(--border);text-align:center;transition:var(--ease)}
+.stat-item:last-child{border-right:none}
+.stat-item:hover{background:rgba(255,255,255,.02)}
+.stat-val{font-family:var(--font-display);font-size:clamp(32px,3.5vw,48px);font-weight:800;letter-spacing:-.05em;color:var(--t-primary);line-height:1}
+.stat-val .gold{color:var(--gold-2)}
+.stat-desc{font-size:13px;color:var(--t-muted);margin-top:8px;font-weight:400;line-height:1.5}
+
+/* ═══ ROADMAP ═══ */
+.roadmap-section{background:var(--ink-2);position:relative;overflow:hidden}
+.roadmap-section::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 40% at 50% 50%,rgba(201,168,76,.03),transparent);pointer-events:none}
+.roadmap-timeline{position:relative;margin-top:64px;display:flex;flex-direction:column;gap:0}
+.roadmap-timeline::before{content:'';position:absolute;left:110px;top:24px;bottom:24px;width:1px;background:linear-gradient(180deg,transparent,var(--gold),transparent);opacity:.3}
+.rm-item{display:grid;grid-template-columns:100px 1fr;gap:40px;padding:28px 0;position:relative;align-items:flex-start}
+.rm-item:not(:last-child){border-bottom:1px solid var(--border)}
+.rm-period{font-family:var(--font-mono);font-size:11px;font-weight:500;letter-spacing:1px;color:var(--t-muted);text-align:right;padding-top:4px;line-height:1.4}
+.rm-dot-wrap{position:absolute;left:104px;top:32px;display:flex;align-items:center;justify-content:center;width:12px;height:12px}
+.rm-dot{width:10px;height:10px;border-radius:50%;background:var(--gold);box-shadow:0 0 0 3px rgba(201,168,76,.15)}
+.rm-content{padding-left:24px}
+.rm-tag{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:999px;font-family:var(--font-mono);font-size:10px;font-weight:600;letter-spacing:.5px;margin-bottom:10px;background:var(--gold-dim);border:1px solid rgba(201,168,76,.2);color:var(--gold)}
+.rm-title{font-family:var(--font-display);font-size:18px;font-weight:700;color:var(--t-primary);margin-bottom:6px;letter-spacing:-.02em}
+.rm-desc{font-size:13px;color:var(--t-secondary);line-height:1.65;max-width:600px}
+
+/* ═══ FOOTER ═══ */
+.footer{background:var(--ink-2);border-top:1px solid var(--border)}
+.footer-top{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:48px;padding:64px 0 48px}
+.footer-brand p{font-size:13px;color:var(--t-muted);line-height:1.7;margin-top:14px;max-width:260px}
+.footer-logo{display:flex;align-items:center;gap:8px;margin-bottom:4px}
+.footer-logo-mark{width:28px;height:28px;background:linear-gradient(135deg,var(--gold),#8a6010);border-radius:6px;display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:13px;font-weight:800;color:var(--ink)}
+.footer-logo-name{font-family:var(--font-display);font-size:18px;font-weight:700;color:var(--t-primary);letter-spacing:-.02em}
+.footer-logo-name span{color:var(--gold)}
+.footer-col-title{font-family:var(--font-mono);font-size:10px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:var(--t-muted);margin-bottom:18px}
+.footer-links{list-style:none;display:flex;flex-direction:column;gap:10px}
+.footer-links a{font-size:13px;color:var(--t-secondary);transition:var(--ease)}
+.footer-links a:hover{color:var(--t-primary)}
+.footer-bottom{border-top:1px solid var(--border);padding:20px 0;display:flex;align-items:center;justify-content:space-between}
+.footer-bottom p{font-size:12px;color:var(--t-muted)}
+.footer-school{font-size:11px;color:var(--t-muted);font-family:var(--font-mono);text-align:right;line-height:1.5}
+
+/* ═══ RESPONSIVE ═══ */
+@media(max-width:1060px){
+  .hero-inner{grid-template-columns:1fr;gap:60px}.hero-right{display:none}
+  .express-grid{grid-template-columns:1fr;gap:40px}.result-grid{grid-template-columns:1fr;gap:32px}
+  .ai-section-inner{grid-template-columns:1fr;gap:48px}.footer-top{grid-template-columns:1fr 1fr}
+}
+@media(max-width:760px){
+  .c{padding:0 24px}.how-grid{grid-template-columns:1fr 1fr}
+  .pricing-grid{grid-template-columns:1fr}.who-grid{grid-template-columns:1fr}
+  .stats-row{flex-direction:column}.fines-grid{grid-template-columns:1fr 1fr}
+  nav .nav-links{display:none}.hero-actions{flex-direction:column;align-items:flex-start}
+  .footer-top{grid-template-columns:1fr}.roadmap-timeline::before{display:none}
+  .rm-item{grid-template-columns:1fr}.rm-period{text-align:left}.rm-dot-wrap{display:none}.rm-content{padding-left:0}
+}
+@media(max-width:500px){.fines-grid{grid-template-columns:1fr}.how-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav id="nav">
+  <div class="c nav-inner">
+    <div class="nav-logo">
+      <div class="nav-logo-mark">N</div>
+      <div class="nav-logo-name">NF<span>Q</span></div>
+      <div class="nav-logo-badge">Аудит 3-в-1</div>
+    </div>
+    <ul class="nav-links">
+      <li><a href="#check">Проверить бизнес</a></li>
+      <li><a href="#how">Как работает</a></li>
+      <li><a href="#packages">Тарифы</a></li>
+      <li><a href="#who">Кому подходит</a></li>
+      <li><a href="#chat">Консультант</a></li>
+    </ul>
+    <div class="nav-right">
+      <a href="#" class="btn btn-ghost" style="padding:9px 20px;font-size:13px">Войти</a>
+      <a href="#check" class="btn btn-primary" style="padding:9px 20px;font-size:13px">Проверить сейчас</a>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="top">
+  <div class="hero-ambient">
+    <div class="hero-orb hero-orb-1"></div>
+    <div class="hero-orb hero-orb-2"></div>
+    <div class="hero-grid"></div>
+  </div>
+  <div class="c">
+    <div class="hero-inner">
+      <div class="hero-left">
+        <div class="hero-kicker sr">
+          <div class="kicker-dot"></div>
+          <span class="kicker-text">Комплексный аудит безопасности МСБ</span>
+        </div>
+        <h1 class="hero-headline sr" style="transition-delay:.07s">
+          Три проверки.<br>Один выезд.<br>Полная защита<br><span class="hl-gold">вашего бизнеса.</span>
+        </h1>
+        <p class="hero-sub sr" style="transition-delay:.14s">
+          NFQ заменяет три разрозненных аудита одной комплексной диагностикой — МЧС, Роспотребнадзор и охрана труда за 1–1,5 недели. Единый отчёт, готовый план устранений, персональный куратор.
+        </p>
+        <div class="hero-vals sr" style="transition-delay:.19s">
+          <div class="hero-val"><div class="hero-val-ico">✓</div>МЧС · Пожарная безопасность (КоАП ст. 20.4)</div>
+          <div class="hero-val"><div class="hero-val-ico">✓</div>Роспотребнадзор · Санитарные нормы (СанПиН)</div>
+          <div class="hero-val"><div class="hero-val-ico">✓</div>Роструд · Охрана труда (КоАП ст. 5.27.1)</div>
+        </div>
+        <div class="hero-actions sr" style="transition-delay:.24s">
+          <a href="#check" class="btn btn-primary btn-xl">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2L14 8L8 14M2 8H14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Бесплатная экспресс-проверка
+          </a>
+          <a href="#packages" class="btn btn-secondary btn-lg">Посмотреть тарифы</a>
+        </div>
+        <div class="hero-trust sr" style="transition-delay:.3s">
+          <div class="hero-trust-label">Первый год работы</div>
+          <div class="hero-trust-nums">
+            <div class="hero-trust-item"><div class="hero-trust-val">35+</div><div class="hero-trust-lab">Клиентов</div></div>
+            <div class="hero-trust-item"><div class="hero-trust-val">40%</div><div class="hero-trust-lab">Экономия</div></div>
+            <div class="hero-trust-item"><div class="hero-trust-val">7 мес</div><div class="hero-trust-lab">Окупаемость</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Dashboard mock -->
+      <div class="hero-right sr-r" style="transition-delay:.2s">
+        <div class="hero-dash">
+          <div class="dash-topbar">
+            <div class="dash-dots">
+              <div class="dash-dot dash-dot-r"></div>
+              <div class="dash-dot dash-dot-y"></div>
+              <div class="dash-dot dash-dot-g"></div>
+            </div>
+            <div class="dash-title">NFQ · Risk Dashboard</div>
+          </div>
+          <div class="dash-body">
+            <div class="dash-score-row">
+              <div class="risk-ring-wrap">
+                <svg class="risk-ring-svg" width="88" height="88" viewBox="0 0 88 88">
+                  <circle class="risk-ring-track" cx="44" cy="44" r="35"/>
+                  <circle class="risk-ring-fill red" id="heroRing" cx="44" cy="44" r="35"/>
+                </svg>
+                <div class="risk-ring-num">
+                  <div class="ring-score">74</div>
+                  <div class="ring-label">Риск</div>
+                </div>
+              </div>
+              <div>
+                <div class="score-info-title">ИП «Прованс Кафе»</div>
+                <div class="score-info-desc">Выявлены критические нарушения<br>по 2 из 3 направлений проверки</div>
+                <div class="score-cat amber">⚠ Высокий риск штрафов</div>
+              </div>
+            </div>
+            <div class="risk-bars">
+              <div class="risk-bar-row">
+                <div class="rbl">Пожарная БЗ</div>
+                <div class="rb-track"><div class="rb-fill danger" data-w="82"></div></div>
+                <div class="rb-val danger">82%</div>
+              </div>
+              <div class="risk-bar-row">
+                <div class="rbl">СанПиН</div>
+                <div class="rb-track"><div class="rb-fill warn" data-w="65"></div></div>
+                <div class="rb-val warn">65%</div>
+              </div>
+              <div class="risk-bar-row">
+                <div class="rbl">Охрана труда</div>
+                <div class="rb-track"><div class="rb-fill warn" data-w="48"></div></div>
+                <div class="rb-val warn">48%</div>
+              </div>
+              <div class="risk-bar-row">
+                <div class="rbl">Вероятность пр.</div>
+                <div class="rb-track"><div class="rb-fill mid" data-w="70"></div></div>
+                <div class="rb-val mid">70%</div>
+              </div>
+            </div>
+            <div class="dash-ai">
+              <div class="dash-ai-ico">🛡️</div>
+              <div>
+                <div class="dash-ai-label">NFQ Рекомендация</div>
+                <div class="dash-ai-msg">Приоритет: огнетушители и эвакуационные выходы — критический риск до 200 000 ₽. Требуется выездной аудит.</div>
+              </div>
+            </div>
+            <div class="dash-alerts">
+              <div class="alert-row danger-bg">
+                <div class="alert-dot" style="background:var(--red-risk)"></div>
+                <span style="color:var(--red-risk);font-weight:600">Критично</span>&nbsp;— нарушены пути эвакуации (МЧС)
+              </div>
+              <div class="alert-row warn-bg">
+                <div class="alert-dot" style="background:var(--amber-risk)"></div>
+                <span style="color:var(--amber-risk);font-weight:600">Внимание</span>&nbsp;— отсутствуют медкнижки 3 сотр.
+              </div>
+              <div class="alert-row ok-bg">
+                <div class="alert-dot" style="background:var(--green-safe)"></div>
+                <span style="color:var(--green-safe);font-weight:600">Готово</span>&nbsp;— вводный инструктаж проведён
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="hero-float hero-float-1">
+          <div class="float-card">
+            <div class="float-card-label">Аудит завершён</div>
+            <div class="float-card-val">2 дня</div>
+            <div class="float-card-sub up">↑ Вместо 3–5 недель</div>
+          </div>
+        </div>
+        <div class="hero-float hero-float-2">
+          <div class="float-card">
+            <div class="float-card-label">Риск штрафа</div>
+            <div class="float-card-val">₽410К</div>
+            <div class="float-card-sub red">↓ Устранён по плану NFQ</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- LOGOS -->
+<div class="logos-strip">
+  <div class="c">
+    <div class="logos-inner">
+      <div class="logos-label">Проверяем объекты</div>
+      <div class="logo-chip"><span class="logo-chip-dot"></span>Рестораны</div>
+      <div class="logo-chip"><span class="logo-chip-dot"></span>Кафе / Фастфуд</div>
+      <div class="logo-chip"><span class="logo-chip-dot"></span>Ночные клубы</div>
+      <div class="logo-chip"><span class="logo-chip-dot"></span>Кальянные</div>
+      <div class="logo-chip"><span class="logo-chip-dot"></span>Офисы</div>
+      <div class="logo-chip"><span class="logo-chip-dot"></span>Call-центры</div>
+      <div class="logo-chip"><span class="logo-chip-dot"></span>Торговые точки</div>
+    </div>
+  </div>
+</div>
+
+<!-- FINES -->
+<section class="section-sm fines-section">
+  <div class="c">
+    <div class="sec-header-center sr">
+      <div class="eyebrow">Реальные последствия</div>
+      <h2 class="sec-title" style="font-size:clamp(28px,3vw,42px)">Что грозит без аудита</h2>
+      <p class="sec-sub" style="font-size:16px">Суммы штрафов по КоАП РФ для юридических лиц — актуально на 2025 год</p>
+    </div>
+    <div class="fines-grid sr" style="transition-delay:.1s">
+      <div class="fine-card">
+        <div class="fine-ico">🔥</div>
+        <div>
+          <div class="fine-dept">МЧС · КоАП ст. 20.4</div>
+          <div class="fine-title">Пожарная безопасность</div>
+          <div class="fine-desc">Отсутствие огнетушителей, захламлённые эвакуационные пути, неисправная сигнализация</div>
+        </div>
+        <div class="fine-amount"><span class="fine-up-to">до</span>200 000 ₽</div>
+      </div>
+      <div class="fine-card">
+        <div class="fine-ico">🦠</div>
+        <div>
+          <div class="fine-dept">Роспотребнадзор · СанПиН</div>
+          <div class="fine-title">Санитарные нарушения</div>
+          <div class="fine-desc">Просроченные медкнижки, нарушение температурных режимов, несоблюдение норм хранения</div>
+        </div>
+        <div class="fine-amount"><span class="fine-up-to">до</span>130 000 ₽</div>
+      </div>
+      <div class="fine-card">
+        <div class="fine-ico">👷</div>
+        <div>
+          <div class="fine-dept">Трудовая инспекция · ТК РФ</div>
+          <div class="fine-title">Охрана труда</div>
+          <div class="fine-desc">Нет инструктажей, неправильное оформление трудовых договоров, отсутствие документов по ОТ</div>
+        </div>
+        <div class="fine-amount"><span class="fine-up-to">до</span>80 000 ₽</div>
+      </div>
+      <div class="fine-card fine-card-accent">
+        <div class="fine-ico">🚫</div>
+        <div>
+          <div class="fine-dept">Совокупный риск за одну проверку</div>
+          <div class="fine-title">Приостановка деятельности</div>
+          <div class="fine-desc">При нескольких нарушениях штрафы суммируются + остановка работы до 90 суток</div>
+        </div>
+        <div class="fine-amount fine-total"><span class="fine-up-to">до</span>90 дней</div>
+      </div>
+    </div>
+    <div class="sr" style="text-align:center;margin-top:32px;transition-delay:.2s">
+      <a href="#check" class="btn btn-primary btn-lg">Проверить свой бизнес бесплатно →</a>
+    </div>
+  </div>
+</section>
+
+<!-- EXPRESS CHECK -->
+<section class="section express-section" id="check">
+  <div class="c">
+    <div class="sr">
+      <div class="eyebrow">Экспресс-диагностика</div>
+      <h2 class="sec-title">Узнайте уровень риска<br>вашего бизнеса</h2>
+      <p class="sec-sub">7 вопросов — и система NFQ рассчитает ваш Risk Score, вероятность штрафов от МЧС, Роспотребнадзора и Роструда, и выдаст приоритетный план действий.</p>
+    </div>
+    <div class="express-grid">
+      <div class="sr-l" style="transition-delay:.1s">
+        <div class="form-card">
+          <div class="form-topbar">
+            <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M3 4H13M3 8H10M3 12H7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            <span class="form-topbar-title">NFQ · Экспресс-аудит соответствия</span>
+          </div>
+          <div class="form-body">
+            <div class="form-row">
+              <label class="form-label">1. Сфера бизнеса</label>
+              <div class="form-select-wrap">
+                <select class="form-select" id="f-industry">
+                  <option value="">Выберите отрасль</option>
+                  <option value="food">Общепит — кафе, ресторан, столовая</option>
+                  <option value="night">Бар, клуб, кальянная, боулинг</option>
+                  <option value="office">Офис, call-центр, IT-компания</option>
+                  <option value="trade">Розничная торговля, магазин</option>
+                  <option value="prod">Производство, склад</option>
+                  <option value="kids">Детский центр, образование</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-row">
+              <label class="form-label">2. Количество сотрудников</label>
+              <div class="form-select-wrap">
+                <select class="form-select" id="f-size">
+                  <option value="">Выберите</option>
+                  <option value="1">До 5 человек</option>
+                  <option value="2">5–20 человек</option>
+                  <option value="3">20–50 человек</option>
+                  <option value="4">Более 50 человек</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-row">
+              <label class="form-label">3. Последняя проверка контролирующих органов</label>
+              <div class="form-select-wrap">
+                <select class="form-select" id="f-lastcheck">
+                  <option value="">Выберите</option>
+                  <option value="recent">В течение последнего года</option>
+                  <option value="medium">1–3 года назад</option>
+                  <option value="old">Более 3 лет назад</option>
+                  <option value="never">Никогда не было</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-row">
+              <label class="form-label">4. Документы по пожарной безопасности</label>
+              <div class="form-radio-group">
+                <label class="form-radio"><input type="radio" name="fire" value="full"><span class="form-radio-label">Полный порядок</span></label>
+                <label class="form-radio"><input type="radio" name="fire" value="partial"><span class="form-radio-label">Частично</span></label>
+                <label class="form-radio"><input type="radio" name="fire" value="no"><span class="form-radio-label">Нет / не знаю</span></label>
+              </div>
+            </div>
+            <div class="form-row">
+              <label class="form-label">5. Медкнижки и санитарные журналы</label>
+              <div class="form-radio-group">
+                <label class="form-radio"><input type="radio" name="sanit" value="full"><span class="form-radio-label">Всё актуально</span></label>
+                <label class="form-radio"><input type="radio" name="sanit" value="partial"><span class="form-radio-label">Частично</span></label>
+                <label class="form-radio"><input type="radio" name="sanit" value="no"><span class="form-radio-label">Нет / не знаю</span></label>
+              </div>
+            </div>
+            <div class="form-row">
+              <label class="form-label">6. Инструктажи по охране труда</label>
+              <div class="form-radio-group">
+                <label class="form-radio"><input type="radio" name="labor" value="full"><span class="form-radio-label">Регулярно</span></label>
+                <label class="form-radio"><input type="radio" name="labor" value="partial"><span class="form-radio-label">Иногда</span></label>
+                <label class="form-radio"><input type="radio" name="labor" value="no"><span class="form-radio-label">Не проводятся</span></label>
+              </div>
+            </div>
+            <div class="form-row">
+              <label class="form-label">7. Был ли штраф за последние 2 года</label>
+              <div class="form-radio-group">
+                <label class="form-radio"><input type="radio" name="fine" value="no"><span class="form-radio-label">Нет</span></label>
+                <label class="form-radio"><input type="radio" name="fine" value="yes"><span class="form-radio-label">Да</span></label>
+                <label class="form-radio"><input type="radio" name="fine" value="na"><span class="form-radio-label">Не помню</span></label>
+              </div>
+            </div>
+            <button class="btn btn-primary btn-lg" style="width:100%;justify-content:center;margin-top:8px" onclick="calcRisk()">
+              Рассчитать Risk Score →
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="express-info sr-r" style="transition-delay:.15s">
+        <div style="margin-bottom:8px">
+          <div class="eyebrow">Что входит в аудит</div>
+          <p style="font-size:15px;color:var(--t-secondary);line-height:1.7;max-width:420px">Экспресс-анкета даёт предварительную оценку. Полный выездной аудит NFQ проверяет объект по 50–80 контрольным точкам.</p>
+        </div>
+        <div class="ei-item">
+          <div class="ei-ico">🔥</div>
+          <div>
+            <div class="ei-title">МЧС · Пожарная безопасность</div>
+            <div class="ei-desc">Эвакуационные пути, огнетушители, сигнализация, электрохозяйство. Штрафы — до 200 000 ₽.</div>
+          </div>
+        </div>
+        <div class="ei-item">
+          <div class="ei-ico">🦠</div>
+          <div>
+            <div class="ei-title">Роспотребнадзор · СанПиН</div>
+            <div class="ei-desc">Медкнижки, микроклимат, вентиляция, санитарное состояние. Штрафы — до 130 000 ₽.</div>
+          </div>
+        </div>
+        <div class="ei-item">
+          <div class="ei-ico">👷</div>
+          <div>
+            <div class="ei-title">Роструд · Охрана труда</div>
+            <div class="ei-desc">Документы ОТ, инструктажи, рабочие места, трудовые договоры. Штрафы — до 80 000 ₽.</div>
+          </div>
+        </div>
+        <div class="ei-item">
+          <div class="ei-ico">📊</div>
+          <div>
+            <div class="ei-title">Ваш результат содержит</div>
+            <div class="ei-desc">Risk Score · вероятность проверки · перечень нарушений со ссылками на КоАП · приоритетный план устранения.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- RESULT SECTION (dynamic) -->
+<section class="result-section" id="result-section">
+  <div class="c">
+    <div class="sr">
+      <div class="eyebrow">Результат анализа</div>
+      <h2 class="sec-title">Ваш NFQ Risk Score</h2>
+      <p class="sec-sub">На основе ваших ответов система NFQ рассчитала вероятность штрафов и нарушений по каждому направлению проверки.</p>
+    </div>
+    <div class="result-grid" style="margin-top:64px">
+      <div class="result-score-card sr-l" style="transition-delay:.05s">
+        <div class="result-header">
+          <div class="result-header-title">NFQ · Risk Score Report</div>
+          <div class="result-header-badge" id="resultDate"></div>
+        </div>
+        <div class="result-score-body">
+          <div class="score-gauge-wrap">
+            <div class="score-gauge">
+              <svg width="120" height="120" viewBox="0 0 120 120">
+                <circle class="score-ring-track" cx="60" cy="60" r="49"/>
+                <circle class="score-ring-fill" id="scoreRingFill" cx="60" cy="60" r="49"/>
+              </svg>
+              <div class="score-num-wrap">
+                <div class="score-num-big" id="scoreNumBig">0</div>
+                <div class="score-num-label">Risk Score</div>
+              </div>
+            </div>
+            <div>
+              <div class="score-meta-title" id="scoreMetaTitle">Анализируется...</div>
+              <div class="score-meta-desc" id="scoreMetaDesc">Подождите, рассчитываем риски</div>
+              <div class="score-verdict" id="scoreVerdict"></div>
+            </div>
+          </div>
+          <div class="result-cats" id="resultCats"></div>
+        </div>
+      </div>
+      <div class="result-recs sr-r" style="transition-delay:.1s">
+        <div class="result-recs-title">Приоритетные рекомендации</div>
+        <div id="resultRecs"></div>
+        <a href="#chat" class="btn btn-primary btn-lg" style="margin-top:24px;width:100%;justify-content:center">
+          Обсудить с консультантом NFQ →
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="section how-section" id="how">
+  <div class="c">
+    <div class="sec-header-center sr">
+      <div class="eyebrow">Процесс</div>
+      <h2 class="sec-title">Как работает NFQ</h2>
+      <p class="sec-sub">Четыре этапа от первого звонка до полной защиты бизнеса — без лишних согласований.</p>
+    </div>
+    <div class="how-grid sr" style="transition-delay:.1s;margin-top:64px">
+      <div class="how-card">
+        <div class="how-card-num">01 <span style="font-size:10px;opacity:.5;letter-spacing:1px">ЗАЯВКА</span></div>
+        <div class="how-card-ico gold">📞</div>
+        <h3>Онлайн-консультация</h3>
+        <p>Собираем данные о вашем бизнесе, обсуждаем зоны риска и планируем выезд удобно для вас.</p>
+        <div class="how-card-time">1 день</div>
+        <div class="how-card-arrow">→</div>
+      </div>
+      <div class="how-card">
+        <div class="how-card-num">02 <span style="font-size:10px;opacity:.5;letter-spacing:1px">АУДИТ</span></div>
+        <div class="how-card-ico red">🔍</div>
+        <h3>Выездная проверка</h3>
+        <p>Эксперт с оборудованием проверяет ПБ, СанПиН и ОТ одновременно. Фотофиксация, чек-листы по 80 пунктам.</p>
+        <div class="how-card-time">2–5 дней</div>
+        <div class="how-card-arrow">→</div>
+      </div>
+      <div class="how-card">
+        <div class="how-card-num">03 <span style="font-size:10px;opacity:.5;letter-spacing:1px">ОТЧЁТ</span></div>
+        <div class="how-card-ico blue">📋</div>
+        <h3>Единый отчёт</h3>
+        <p>Стратегический документ с рейтингом рисков, ссылками на КоАП, фотодоказательствами и пошаговым планом.</p>
+        <div class="how-card-time">2–4 дня</div>
+        <div class="how-card-arrow">→</div>
+      </div>
+      <div class="how-card">
+        <div class="how-card-num">04 <span style="font-size:10px;opacity:.5;letter-spacing:1px">ЗАЩИТА</span></div>
+        <div class="how-card-ico green">🛡️</div>
+        <h3>Сопровождение</h3>
+        <p>Персональный куратор ведёт вас до полного устранения нарушений. 100% уверенность перед любой проверкой.</p>
+        <div class="how-card-time">до 30 дней</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<section class="stats-section section-sm">
+  <div class="c">
+    <div class="stats-row sr">
+      <div class="stat-item">
+        <div class="stat-val"><span class="gold">70К</span>₽</div>
+        <div class="stat-desc">Комплексный аудит 3-в-1<br>вместо 85К+ у разных специалистов</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-val"><span class="gold">40%</span></div>
+        <div class="stat-desc">Экономия времени<br>и бюджета клиента</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-val"><span class="gold">240%</span></div>
+        <div class="stat-desc">ROI проекта<br>за первый год работы</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-val"><span class="gold">82К</span></div>
+        <div class="stat-desc">Проверок в Москве за 2023<br>Рост ×8 за три года</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PACKAGES -->
+<section class="section packages-section" id="packages">
+  <div class="c">
+    <div class="sec-header-center sr">
+      <div class="eyebrow">Тарифы</div>
+      <h2 class="sec-title">Выберите формат аудита</h2>
+      <p class="sec-sub">Все пакеты включают выездного эксперта, единый отчёт и план устранения нарушений.</p>
+    </div>
+    <div class="pricing-grid">
+
+      <!-- Базовый -->
+      <div class="pkg-card sr" style="transition-delay:.05s">
+        <div class="pkg-header">
+          <div class="pkg-top">
+            <div class="pkg-name">Базовый</div>
+          </div>
+          <div class="pkg-price">
+            <span class="pkg-price-curr">₽</span>
+            <span class="pkg-price-val">30–40К</span>
+          </div>
+          <div class="pkg-price-note">За одно направление на выбор</div>
+        </div>
+        <div class="pkg-divider"></div>
+        <ul class="pkg-features">
+          <li class="pkg-feat-item">Одно направление — ПБ, СанПиН или ОТ</li>
+          <li class="pkg-feat-item">Выездная проверка 4–5 часов</li>
+          <li class="pkg-feat-item">Документационный аудит</li>
+          <li class="pkg-feat-item">Сводная таблица нарушений</li>
+          <li class="pkg-feat-item">Рекомендации с нормативами</li>
+          <li class="pkg-feat-item">Контакты подрядчиков</li>
+        </ul>
+        <button class="pkg-cta pkg-cta-outline" onclick="document.getElementById('chat').scrollIntoView({behavior:'smooth'})">Заказать</button>
+      </div>
+
+      <!-- Комплексный -->
+      <div class="pkg-card pkg-card-featured sr" style="transition-delay:.1s">
+        <div class="pkg-header">
+          <div class="pkg-top">
+            <div class="pkg-name">Комплексный 3-в-1</div>
+            <span class="pkg-save">Популярный</span>
+          </div>
+          <div class="pkg-price">
+            <span class="pkg-price-curr">₽</span>
+            <span class="pkg-price-val">70 000</span>
+          </div>
+          <div class="pkg-price-note">Все три направления — один выезд</div>
+        </div>
+        <div class="pkg-divider"></div>
+        <ul class="pkg-features">
+          <li class="pkg-feat-item">МЧС + Роспотребнадзор + Роструд</li>
+          <li class="pkg-feat-item">Выездная проверка всего объекта</li>
+          <li class="pkg-feat-item">Единый стратегический отчёт</li>
+          <li class="pkg-feat-item">Risk Score с рейтингом нарушений</li>
+          <li class="pkg-feat-item">Пошаговый план с приоритетами</li>
+          <li class="pkg-feat-item">Онлайн-презентация (60 мин)</li>
+          <li class="pkg-feat-item">Персональный менеджер</li>
+        </ul>
+        <button class="pkg-cta pkg-cta-primary" onclick="document.getElementById('chat').scrollIntoView({behavior:'smooth'})">Заказать аудит</button>
+      </div>
+
+      <!-- Премиум -->
+      <div class="pkg-card sr" style="transition-delay:.15s">
+        <div class="pkg-header">
+          <div class="pkg-top">
+            <div class="pkg-name">Премиум</div>
+          </div>
+          <div class="pkg-price">
+            <span class="pkg-price-curr">₽</span>
+            <span class="pkg-price-val">97 000</span>
+          </div>
+          <div class="pkg-price-note">3-в-1 + полное сопровождение под ключ</div>
+        </div>
+        <div class="pkg-divider"></div>
+        <ul class="pkg-features">
+          <li class="pkg-feat-item">Всё из комплексного пакета</li>
+          <li class="pkg-feat-item">Углублённый анализ с юристом</li>
+          <li class="pkg-feat-item">Подбор 3 вариантов подрядчиков</li>
+          <li class="pkg-feat-item">60 дней сопровождения</li>
+          <li class="pkg-feat-item">2 контрольных выезда</li>
+          <li class="pkg-feat-item">Акт приёмки + сертификат</li>
+          <li class="pkg-feat-item">Рекомендательное письмо органам</li>
+        </ul>
+        <button class="pkg-cta pkg-cta-outline" onclick="document.getElementById('chat').scrollIntoView({behavior:'smooth'})">Заказать</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WHO -->
+<section class="section who-section" id="who">
+  <div class="c">
+    <div class="sr">
+      <div class="eyebrow">Целевая аудитория</div>
+      <h2 class="sec-title">Кому нужен NFQ</h2>
+      <p class="sec-sub">Три сегмента с наибольшей концентрацией регуляторных рисков и высокой готовностью к аудиту.</p>
+    </div>
+    <div class="who-grid" style="margin-top:64px">
+      <div class="who-card sr" style="transition-delay:.05s">
+        <span class="who-card-ico">🍽️</span>
+        <h3>Общепит</h3>
+        <div class="who-card-desc">Кафе, рестораны, фастфуд, столовые. Проверки до 3 раз в год — часто внезапные, по жалобам клиентов. Жёсткие требования СанПиН к кухне и хранению продуктов. Потенциальный чек: 50–120 000 ₽.</div>
+        <div class="who-card-risk"><strong>Главный страх:</strong> закрытие по санитарному предписанию до 90 суток — финансовая катастрофа.</div>
+      </div>
+      <div class="who-card sr" style="transition-delay:.1s">
+        <span class="who-card-ico">🎭</span>
+        <h3>Развлечения</h3>
+        <div class="who-card-desc">Бары, клубы, кальянные, антикафе, боулинг. Строгие требования МЧС к массовому пребыванию людей. Ночные проверки. Высокий репутационный риск при публичных инцидентах. Чек: 40–90 000 ₽.</div>
+        <div class="who-card-risk"><strong>Главный страх:</strong> внезапная проверка МЧС и закрытие в разгар рабочей недели.</div>
+      </div>
+      <div class="who-card sr" style="transition-delay:.15s">
+        <span class="who-card-ico">🏢</span>
+        <h3>Офисы и Call-центры</h3>
+        <div class="who-card-desc">Офисные центры, коворкинги, call-центры. Проверки Роструда по обязательной документации по ОТ. Жалобы сотрудников, судебные риски за несчастные случаи. Чек: 30–70 000 ₽.</div>
+        <div class="who-card-risk"><strong>Главный страх:</strong> жалоба сотрудника в Роструд — штраф и проверка всей документации.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ROADMAP -->
+<section class="section roadmap-section">
+  <div class="c">
+    <div class="sr">
+      <div class="eyebrow">Дорожная карта</div>
+      <h2 class="sec-title">План реализации</h2>
+      <p class="sec-sub">Пять этапов от подготовки до масштабирования в новые регионы России.</p>
+    </div>
+    <div class="roadmap-timeline">
+      <div class="rm-item sr" style="transition-delay:.05s">
+        <div class="rm-period">Окт—Нояб<br>2025</div>
+        <div class="rm-dot-wrap"><div class="rm-dot"></div></div>
+        <div class="rm-content">
+          <div class="rm-tag">Этап 1</div>
+          <div class="rm-title">Подготовка</div>
+          <div class="rm-desc">Формирование команды и ролей. Разработка методологии аудита v1.0. Пилотная апробация. Финализация услуг и цен. Подготовка презентационных материалов.</div>
+        </div>
+      </div>
+      <div class="rm-item sr" style="transition-delay:.08s">
+        <div class="rm-period">Дек—Янв<br>2025–26</div>
+        <div class="rm-dot-wrap"><div class="rm-dot"></div></div>
+        <div class="rm-content">
+          <div class="rm-tag">Этап 2</div>
+          <div class="rm-title">Коммерческий запуск</div>
+          <div class="rm-desc">5–10 первых выездных аудитов. Сбор обратной связи и оптимизация процессов. Фокус на сегменте общественного питания. Первые кейсы и отзывы.</div>
+        </div>
+      </div>
+      <div class="rm-item sr" style="transition-delay:.11s">
+        <div class="rm-period">Февр—Апр<br>2026</div>
+        <div class="rm-dot-wrap"><div class="rm-dot"></div></div>
+        <div class="rm-content">
+          <div class="rm-tag">Этап 3</div>
+          <div class="rm-title">Стандартизация</div>
+          <div class="rm-desc">Чек-листы v2.0. Двойная проверка отчётов. Обучение и аттестация экспертов. Единый язык формулировок. Стандартизированный продукт.</div>
+        </div>
+      </div>
+      <div class="rm-item sr" style="transition-delay:.14s">
+        <div class="rm-period">Май—Июль<br>2026</div>
+        <div class="rm-dot-wrap"><div class="rm-dot"></div></div>
+        <div class="rm-content">
+          <div class="rm-tag">Этап 4</div>
+          <div class="rm-title">Система</div>
+          <div class="rm-desc">Централизация утверждения отчётов. KPI и SLA. Единый операционный пайплайн. CRM AmoCRM. Чек-листы v3.0. Управляемая операционная система.</div>
+        </div>
+      </div>
+      <div class="rm-item sr" style="transition-delay:.17s">
+        <div class="rm-period">Авг—Окт<br>2026</div>
+        <div class="rm-dot-wrap"><div class="rm-dot"></div></div>
+        <div class="rm-content">
+          <div class="rm-tag">Этап 5</div>
+          <div class="rm-title">Масштабирование</div>
+          <div class="rm-desc">Полная методология аудита. Регламенты и стандарты качества. Финальная экономика 1 аудита. Готовность к выходу в новые регионы и лицензированию.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- AI CHAT -->
+<section class="section ai-section" id="chat">
+  <div class="c">
+    <div class="sr">
+      <div class="eyebrow">Консультант NFQ</div>
+      <h2 class="sec-title">Задайте вопрос<br>по нормам и штрафам</h2>
+      <p class="sec-sub">Спросите о требованиях МЧС, Роспотребнадзора или охраны труда — и получите ответ с ссылками на нормативы.</p>
+    </div>
+    <div class="ai-section-inner">
+      <div class="sr-l" style="transition-delay:.1s">
+        <div class="chat-window">
+          <div class="chat-topbar">
+            <div class="chat-av">NF</div>
+            <div>
+              <div class="chat-info-name">NFQ Консультант</div>
+              <div class="chat-info-status">● онлайн</div>
+            </div>
+          </div>
+          <div class="chat-chips">
+            <span class="chat-chip" onclick="quickChat('МЧС требования')">МЧС</span>
+            <span class="chat-chip" onclick="quickChat('огнетушители требования')">Огнетушители</span>
+            <span class="chat-chip" onclick="quickChat('медкнижки сотрудников')">Медкнижки</span>
+            <span class="chat-chip" onclick="quickChat('охрана труда документы')">Охрана труда</span>
+            <span class="chat-chip" onclick="quickChat('кафе нарушения')">Риски для кафе</span>
+          </div>
+          <div class="chat-msgs" id="chatMessages"></div>
+          <div class="chat-input-row">
+            <input class="chat-input" id="chatInput" placeholder="Спросите о требованиях МЧС, СанПиН, охраны труда..." onkeydown="if(event.key==='Enter')sendChat()">
+            <button class="chat-send" onclick="sendChat()">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M14 8L2 2L6 8L2 14L14 8Z" fill="currentColor"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="ai-right-info sr-r" style="transition-delay:.15s">
+        <div class="ai-feat-item">
+          <div class="ai-feat-ico">🔥</div>
+          <div>
+            <div class="ai-feat-title">МЧС и пожарная безопасность</div>
+            <div class="ai-feat-desc">Требования КоАП ст. 20.4, нормы огнетушителей, пути эвакуации, планы эвакуации, обслуживание систем.</div>
+          </div>
+        </div>
+        <div class="ai-feat-item">
+          <div class="ai-feat-ico">🦠</div>
+          <div>
+            <div class="ai-feat-title">Роспотребнадзор и СанПиН</div>
+            <div class="ai-feat-desc">Медицинские книжки, температурные режимы, вентиляция, производственный контроль, дезинфекция.</div>
+          </div>
+        </div>
+        <div class="ai-feat-item">
+          <div class="ai-feat-ico">👷</div>
+          <div>
+            <div class="ai-feat-title">Охрана труда и кадры</div>
+            <div class="ai-feat-desc">Инструктажи, СОУТ, документы по ОТ, оформление договоров, обязательный минимум для МСБ.</div>
+          </div>
+        </div>
+        <div class="ai-feat-item">
+          <div class="ai-feat-ico">📞</div>
+          <div>
+            <div class="ai-feat-title">Нужен выездной аудит?</div>
+            <div class="ai-feat-desc">Консультант поможет определить приоритетные риски и подобрать подходящий пакет NFQ для вашего бизнеса.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="c">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <div class="footer-logo">
+          <div class="footer-logo-mark">N</div>
+          <div class="footer-logo-name">NF<span>Q</span></div>
+        </div>
+        <p>Сервис комплексного аудита бизнеса для малого и среднего предпринимательства. Пожарная безопасность, СанПиН, охрана труда — 3-в-1.</p>
+        <div style="margin-top:18px;display:flex;gap:8px">
+          <span class="badge badge-gold">Москва и МО</span>
+          <span class="badge badge-green">ООО · УСН 15%</span>
+        </div>
+      </div>
+      <div>
+        <div class="footer-col-title">Услуги</div>
+        <ul class="footer-links">
+          <li><a href="#packages">Комплексный аудит 3-в-1</a></li>
+          <li><a href="#packages">Базовая проверка (1 орган)</a></li>
+          <li><a href="#packages">Премиум — под ключ</a></li>
+          <li><a href="#check">Экспресс-диагностика</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer-col-title">Направления</div>
+        <ul class="footer-links">
+          <li><a href="#">МЧС · Пожарная безопасность</a></li>
+          <li><a href="#">Роспотребнадзор · СанПиН</a></li>
+          <li><a href="#">Роструд · Охрана труда</a></li>
+          <li><a href="#">Комплексная документация</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer-col-title">Компания</div>
+        <ul class="footer-links">
+          <li><a href="#">О проекте NFQ</a></li>
+          <li><a href="#">Команда</a></li>
+          <li><a href="#">Отзывы клиентов</a></li>
+          <li><a href="#chat">Оставить заявку</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2026 NFQ — Комплексный аудит бизнеса · Москва</p>
+      <div class="footer-school">
+        ГБОУ Школа № 2045 им. Героя РФ Д. А. Разумовского<br>
+        Фомкин А.С. · Лебедева К.Н. · Мастеров Д.Д. · Рук. Ходаев О.К.
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+/* ── Scroll reveal ── */
+const rvObs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); rvObs.unobserve(e.target); } });
+}, { threshold: 0.08 });
+document.querySelectorAll('.sr,.sr-l,.sr-r').forEach(el => rvObs.observe(el));
+
+/* ── Nav scroll ── */
+window.addEventListener('scroll', () => {
+  document.getElementById('nav').classList.toggle('scrolled', window.scrollY > 40);
+});
+
+/* ── Animate risk ring in hero ── */
+setTimeout(() => {
+  const ring = document.getElementById('heroRing');
+  if (ring) { ring.style.strokeDashoffset = 220 - (220 * 0.74); }
+  document.querySelectorAll('.rb-fill[data-w]').forEach(el => {
+    setTimeout(() => { el.style.width = el.dataset.w + '%'; }, 800);
+  });
+}, 600);
+
+/* ── Risk score calculator ── */
+function calcRisk() {
+  const industry = document.getElementById('f-industry').value;
+  const size = document.getElementById('f-size').value;
+  const lastCheck = document.getElementById('f-lastcheck').value;
+  const fire = document.querySelector('input[name=fire]:checked')?.value;
+  const sanit = document.querySelector('input[name=sanit]:checked')?.value;
+  const labor = document.querySelector('input[name=labor]:checked')?.value;
+  const fine = document.querySelector('input[name=fine]:checked')?.value;
+
+  if (!industry || !size || !lastCheck || !fire || !sanit || !labor || !fine) {
+    alert('Пожалуйста, ответьте на все вопросы.');
+    return;
+  }
+
+  // Fire risk
+  let fireR = fire === 'no' ? 75 : fire === 'partial' ? 50 : 20;
+  if (industry === 'food' || industry === 'night') fireR += 15;
+  if (lastCheck === 'never' || lastCheck === 'old') fireR += 12;
+  if (fine === 'yes') fireR += 10;
+
+  // Sanit risk
+  let sanitR = sanit === 'no' ? 72 : sanit === 'partial' ? 45 : 15;
+  if (industry === 'food') sanitR += 20;
+  if (size === '3' || size === '4') sanitR += 8;
+  if (lastCheck === 'never') sanitR += 10;
+
+  // Labor risk
+  let laborR = labor === 'no' ? 68 : labor === 'partial' ? 42 : 18;
+  if (size === '3' || size === '4') laborR += 12;
+  if (fine === 'yes') laborR += 8;
+
+  // Check prob
+  let checkProb = 40;
+  if (industry === 'food') checkProb += 25;
+  if (industry === 'night') checkProb += 20;
+  if (lastCheck === 'never') checkProb += 20;
+  if (lastCheck === 'old') checkProb += 12;
+  if (fine === 'yes') checkProb += 15;
+  if (size === '4') checkProb += 8;
+
+  // Clamp
+  fireR = Math.min(97, fireR);
+  sanitR = Math.min(97, sanitR);
+  laborR = Math.min(97, laborR);
+  checkProb = Math.min(95, checkProb);
+
+  const score = Math.round((fireR * 0.38 + sanitR * 0.32 + laborR * 0.30));
+
+  // Show result
+  const section = document.getElementById('result-section');
+  section.classList.add('visible');
+  section.style.display = 'block';
+
+  // Animate score
+  const ring = document.getElementById('scoreRingFill');
+  const num = document.getElementById('scoreNumBig');
+  const level = score >= 60 ? 'high' : score >= 35 ? 'medium' : 'low';
+  ring.className = 'score-ring-fill ' + level;
+  num.className = 'score-num-big ' + level;
+  setTimeout(() => {
+    ring.style.strokeDashoffset = 307 - (307 * score / 100);
+    let cur = 0;
+    const step = setInterval(() => {
+      cur = Math.min(cur + 2, score);
+      num.textContent = cur;
+      if (cur >= score) clearInterval(step);
+    }, 20);
+  }, 300);
+
+  document.getElementById('resultDate').textContent = new Date().toLocaleDateString('ru', {day:'2-digit',month:'2-digit',year:'numeric'});
+  document.getElementById('scoreMetaTitle').textContent = score >= 60 ? 'Высокий риск штрафов' : score >= 35 ? 'Средний уровень риска' : 'Низкий уровень риска';
+  document.getElementById('scoreMetaDesc').textContent = score >= 60
+    ? 'Бизнес имеет критические уязвимости. Вероятность штрафов при проверке — высокая.'
+    : score >= 35
+    ? 'Выявлены нарушения, требующие устранения. Рекомендуется аудит в течение 1–2 месяцев.'
+    : 'Нарушений немного. Профилактический аудит поможет поддержать уровень защиты.';
+
+  const verdicts = { low: '✓ Защищены', medium: '⚠ Требует внимания', high: '✗ Критический риск' };
+  const vEl = document.getElementById('scoreVerdict');
+  vEl.textContent = verdicts[level];
+  vEl.className = 'score-verdict ' + level;
+
+  const cats = [
+    { label: 'МЧС · Пожарная', val: fireR, cls: fireR > 60 ? 'danger' : fireR > 35 ? 'warn' : 'ok' },
+    { label: 'Роспотребнадзор', val: sanitR, cls: sanitR > 60 ? 'danger' : sanitR > 35 ? 'warn' : 'ok' },
+    { label: 'Охрана труда', val: laborR, cls: laborR > 60 ? 'danger' : laborR > 35 ? 'warn' : 'ok' },
+    { label: 'Вер. проверки', val: checkProb, cls: checkProb > 60 ? 'danger' : checkProb > 35 ? 'warn' : 'mid' },
+  ];
+  document.getElementById('resultCats').innerHTML = cats.map(c => `
+    <div class="result-cat-item">
+      <div class="rci-label">${c.label}</div>
+      <div class="rci-track"><div class="rci-fill ${c.cls}" data-w="${c.val}" style="width:0"></div></div>
+      <div class="rci-val ${c.cls}">${c.val}%</div>
+    </div>`).join('');
+  setTimeout(() => {
+    document.querySelectorAll('#resultCats .rci-fill').forEach(f => { f.style.width = f.dataset.w + '%'; });
+  }, 200);
+
+  // Recommendations
+  const allRecs = [
+    { p:'p1', title:'Проверить пути эвакуации и огнетушители', desc:'Минимальный риск штрафа МЧС — 150 000 ₽. Устраните до следующей плановой проверки.' },
+    { p:'p1', title:'Актуализировать медкнижки сотрудников', desc:'Отсутствие у работников общепита грозит штрафом до 130 000 ₽ по КоАП ст. 6.6.' },
+    { p:'p2', title:'Составить комплект документов по охране труда', desc:'Инструкции, журналы инструктажей, приказы — базовый минимум для прохождения проверки Роструда.' },
+    { p:'p2', title:'Провести повторные инструктажи', desc:'Закон требует повторного инструктажа каждые 6 месяцев с подписью в журнале.' },
+    { p:'p3', title:'Заказать комплексный выездной аудит NFQ', desc:'Один выезд заменяет три проверки. Единый отчёт с планом устранений за 1–1,5 недели.' },
+  ];
+  const recs = score >= 60 ? allRecs.slice(0,4) : score >= 35 ? allRecs.slice(1,4) : allRecs.slice(2,5);
+  document.getElementById('resultRecs').innerHTML = recs.map(r => `
+    <div class="rec-item">
+      <div class="rec-prio ${r.p}">${r.p==='p1'?'!':r.p==='p2'?'2':'3'}</div>
+      <div><div class="rec-text-title">${r.title}</div><div class="rec-text-desc">${r.desc}</div></div>
+    </div>`).join('');
+
+  document.querySelectorAll('#result-section .sr, #result-section .sr-l, #result-section .sr-r').forEach(el => {
+    el.classList.remove('in');
+    setTimeout(() => rvObs.observe(el), 100);
+  });
+  setTimeout(() => section.scrollIntoView({ behavior:'smooth', block:'start' }), 100);
+}
+
+/* ── Chat ── */
+const chatResponses = {
+  'мчс': '🔥 <strong>МЧС · КоАП ст. 20.4 — Пожарная безопасность</strong><br><br>Частые нарушения:<br>— Отсутствие или просроченные огнетушители<br>— Захламлённые пути эвакуации<br>— Нет плана эвакуации на видном месте<br>— Неисправная сигнализация<br><br><strong>Штрафы для юрлиц:</strong><br>• Нарушение ПБ — до 200 000 ₽<br>• При пожаре — до 400 000 ₽<br>• Приостановка деятельности до 90 суток',
+  'огнетушит': '🧯 <strong>Требования к огнетушителям (ППР РФ)</strong><br><br>Проверьте:<br>1. Наличие в каждом помещении<br>2. Сроки перезарядки (на бирке)<br>3. Доступность — не загорожены<br>4. Журнал учёта огнетушителей<br>5. Расстояние от рабочих мест — не более 20 м<br><br>Для кухонь — порошковые или углекислотные. <a href="#check" style="color:var(--gold)">Пройдите экспресс-анкету</a> для полной оценки.',
+  'медкниж': '📋 <strong>Медицинские книжки сотрудников</strong><br><br>Обязательны для:<br>— Работников общепита и пищевого производства<br>— Продавцов продуктовых магазинов<br>— Персонала, работающего с едой<br><br><strong>Роспотребнадзор проверит:</strong><br>1. Наличие книжки у каждого работника<br>2. Актуальность медосмотра (раз в год)<br>3. Отметки о гигиеническом обучении<br><br><strong>Штраф за отсутствие</strong> — до 130 000 ₽ для юрлица.',
+  'роспотреб': '🦠 <strong>Роспотребнадзор · Основные требования СанПиН</strong><br><br>Частые нарушения:<br>— Просроченные медкнижки<br>— Нарушение температурного режима<br>— Нет журнала санитарного контроля<br>— Неправильное хранение продуктов<br><br><strong>Штрафы:</strong><br>• Нарушение СанПиН — до 130 000 ₽<br>• Угроза здоровью — приостановка<br><br>Особо уязвимы: общепит, торговля, медицина.',
+  'охрана труда': '👷 <strong>Охрана труда — минимальный комплект</strong><br><br>1. Положение об охране труда<br>2. Инструкции ОТ для каждой должности<br>3. Журнал вводного инструктажа<br>4. Журнал инструктажей на рабочем месте<br>5. Приказ о назначении ответственного<br><br>Для организаций 50+ сотрудников — штатный специалист по ОТ.<br><br><strong>Штраф за отсутствие документов</strong> — до 80 000 ₽.',
+  'инструктаж': '📝 <strong>Виды обязательных инструктажей:</strong><br><br>1. <strong>Вводный</strong> — при приёме на работу<br>2. <strong>Первичный</strong> на рабочем месте — до начала работы<br>3. <strong>Повторный</strong> — каждые 6 месяцев (обязателен!)<br>4. <strong>Внеплановый</strong> — при несчастном случае<br>5. <strong>Целевой</strong> — перед опасными работами<br><br>Все инструктажи фиксируются в журнале с подписью.',
+  'кафе': '🍽️ <strong>Риски для кафе и ресторана:</strong><br><br><strong>МЧС (до 200 000 ₽):</strong><br>— Огнетушители, вытяжка, эвакуация<br>— Особое внимание к кухне<br><br><strong>Роспотребнадзор (до 130 000 ₽):</strong><br>— Медкнижки у всех работников<br>— Температурные журналы<br>— Разделение сырого/готового<br><br><strong>Трудинспекция (до 80 000 ₽):</strong><br>— Инструктажи, оформление договоров<br><br>Общепит — самый проверяемый сектор! <a href="#check" style="color:var(--gold)">Пройдите экспресс-аудит.</a>',
+  'штраф': 'Актуальные штрафы по КоАП РФ (для юр. лиц):<br><br>🔥 <strong>МЧС ст. 20.4</strong> — до 200 000 ₽<br>🦠 <strong>Роспотребнадзор ст. 6.6</strong> — до 130 000 ₽<br>👷 <strong>Роструд ст. 5.27.1</strong> — до 80 000 ₽<br><br>При нескольких нарушениях штрафы суммируются — совокупный риск до 410 000 ₽. При повторных нарушениях — двойной размер.',
+  'цена': '💰 <strong>Тарифы NFQ:</strong><br><br>• <strong>Базовый</strong> (1 направление) — от 30 000 ₽<br>• <strong>Комплексный 3-в-1</strong> — 70 000 ₽<br>• <strong>Премиум</strong> (3-в-1 + сопровождение) — 97 000 ₽<br><br>Три отдельных специалиста обошлись бы от 85 000 ₽, а консалтинговая компания — от 400 000 ₽. NFQ — лучшее соотношение цена/качество для МСБ.',
+};
+
+function getBotResponse(msg) {
+  const lower = msg.toLowerCase();
+  for (const key of Object.keys(chatResponses)) {
+    if (lower.includes(key)) return chatResponses[key];
+  }
+  return `Спасибо за вопрос о <em>${msg.substring(0,50)}${msg.length>50?'...':''}</em>.<br><br>Для точного ответа рекомендую:<br>1. Пройти <a href="#check" style="color:var(--gold)">экспресс-анкету</a> — получите Risk Score и список нарушений.<br>2. Спросите конкретнее: МЧС, огнетушители, медкнижки, охрана труда, инструктажи, штрафы, цена аудита.`;
+}
+
+function addMsg(text, role) {
+  const msgs = document.getElementById('chatMessages');
+  const div = document.createElement('div');
+  div.className = 'chat-msg ' + role;
+  div.innerHTML = `<div class="chat-msg-av">${role==='bot'?'NF':'Вы'}</div><div class="chat-bubble">${text.replace(/\n/g,'<br>')}</div>`;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function showTyping() {
+  const msgs = document.getElementById('chatMessages');
+  const div = document.createElement('div');
+  div.className = 'chat-msg bot';
+  div.id = 'typingInd';
+  div.innerHTML = `<div class="chat-msg-av">NF</div><div class="chat-bubble"><div class="typing-indicator"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div></div>`;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function sendChat() {
+  const input = document.getElementById('chatInput');
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = '';
+  addMsg(text, 'user');
+  showTyping();
+  setTimeout(() => {
+    document.getElementById('typingInd')?.remove();
+    addMsg(getBotResponse(text), 'bot');
+  }, 900 + Math.random() * 600);
+}
+
+function quickChat(text) {
+  document.getElementById('chatInput').value = text;
+  sendChat();
+  document.getElementById('chat').scrollIntoView({ behavior:'smooth', block:'center' });
+}
+
+// Init chat greeting
+window.addEventListener('DOMContentLoaded', () => {
+  setTimeout(() => {
+    addMsg('Привет! Я консультант NFQ 🛡️<br><br>Спросите меня о требованиях <strong>МЧС</strong>, <strong>Роспотребнадзора</strong> или <strong>охраны труда</strong> — отвечу с конкретными нормами и штрафами по КоАП РФ.<br><br>Или нажмите на один из быстрых вопросов выше.', 'bot');
+  }, 500);
+});
+
+// Count-up animation
+const cuObs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (!e.isIntersecting) return;
+    const el = e.target;
+    const target = parseInt(el.dataset.target);
+    let cur = 0;
+    const step = setInterval(() => {
+      cur = Math.min(cur + Math.ceil(target / 50), target);
+      el.textContent = cur.toLocaleString('ru') + (el.dataset.suffix || '');
+      if (cur >= target) clearInterval(step);
+    }, 25);
+    cuObs.unobserve(el);
+  });
+}, { threshold: 0.5 });
+document.querySelectorAll('.count-up').forEach(el => cuObs.observe(el));
+</script>
+</body>
+</html>
